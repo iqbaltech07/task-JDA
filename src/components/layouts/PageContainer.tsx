@@ -7,7 +7,6 @@ interface PageContainerProps extends React.HTMLAttributes<HTMLElement> {
   className?: string;
   children: ReactNode;
   withNavbar?: boolean;
-  withFooter?: boolean;
   withContainer?: boolean;
 }
 

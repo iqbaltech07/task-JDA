@@ -15,7 +15,7 @@ const Cards: React.FC = () => {
                         alt={product.name}
                         className="w-full h-52 object-cover"
                     />
-                    <div className="p-5 flex flex-col h-full">
+                    <div className="p-5 flex flex-col h-[200px] ">
                         <h2 className="text-2xl font-semibold text-white mb-2">{product.name}</h2>
                         <p className="text-gray-300 text-sm mb-4 line-clamp-3">{product.description}</p>
                         <div className="mt-auto flex items-center justify-between">
