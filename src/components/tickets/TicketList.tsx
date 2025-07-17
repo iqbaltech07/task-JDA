@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Ticket } from '~/data/tickets';
+import { Ticket } from '@prisma/client';
 import TicketForm from './TicketForm';
 
 interface TicketListProps {

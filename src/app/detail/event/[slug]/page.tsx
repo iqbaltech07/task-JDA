@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import PageContainer from '~/components/layouts/PageContainer';
-import { Event } from '~/data/events';
-import { Ticket } from '~/data/tickets';
+import { Event, Ticket } from '@prisma/client';
+
+type EventWithTickets = Event & { tickets: Ticket[] };
 
 const DetailEventPage: React.FC = () => {
   const { slug } = useParams();
-  const [event, setEvent] = useState<Event | null>(null);
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [event, setEvent] = useState<EventWithTickets | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,13 +18,14 @@ const DetailEventPage: React.FC = () => {
         try {
           const eventRes = await fetch('/api/events');
           const eventsData = await eventRes.json();
-          const foundEvent = eventsData.find((e: Event) => e.slug === slug);
-          setEvent(foundEvent || null);
-
+          const foundEvent: Event | undefined = eventsData.find((e: Event) => e.slug === slug);
+          
           if (foundEvent) {
             const ticketRes = await fetch(`/api/events/${slug}/tickets`);
-            const ticketsData = await ticketRes.json();
-            setTickets(ticketsData);
+            const ticketsData: Ticket[] = await ticketRes.json();
+            setEvent({ ...foundEvent, tickets: ticketsData });
+          } else {
+            setEvent(null);
           }
         } catch (error) {
           console.error('Failed to fetch details:', error);
@@ -60,8 +61,8 @@ const DetailEventPage: React.FC = () => {
 
       <h2 className="text-2xl font-bold mb-4">Available Tickets</h2>
       <div className="space-y-4">
-        {tickets.length > 0 ? (
-          tickets.map(ticket => (
+        {event.tickets.length > 0 ? (
+          event.tickets.map(ticket => (
             <div key={ticket.id} className="bg-gray-800 p-4 rounded-lg flex justify-between items-center">
               <div>
                 <h3 className="text-xl font-bold text-yellow-400">{ticket.type}</h3>

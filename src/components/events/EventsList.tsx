@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Event } from '~/data/events';
+import { Event } from '@prisma/client';
 import EventForm from './EventForm';
 
 const EventList: React.FC = () => {

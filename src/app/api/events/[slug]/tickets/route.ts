@@ -1,19 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { tickets, Ticket } from "~/data/tickets";
-import { events } from "~/data/events";
+import { prisma } from "~/libs/prisma";
 
 export async function GET(
   request: NextRequest,
   context: { params: { slug: string } }
 ) {
-  const { slug } = context.params;
-  const event = events.find((e) => e.slug === slug);
+  const { slug } = await context.params;
+
+  const event = await prisma.event.findUnique({
+    where: { slug },
+  });
 
   if (!event) {
     return NextResponse.json({ message: "Event not found" }, { status: 404 });
   }
 
-  const eventTickets = tickets.filter((t) => t.eventId === event.id);
+  const eventTickets = await prisma.ticket.findMany({
+    where: { eventId: event.id },
+  });
+
   return NextResponse.json(eventTickets);
 }
 
@@ -21,21 +26,24 @@ export async function POST(
   request: NextRequest,
   context: { params: { slug: string } }
 ) {
-  const { slug } = context.params;
-  const event = events.find((e) => e.slug === slug);
+  const { slug } = await context.params;
+
+  const event = await prisma.event.findUnique({
+    where: { slug },
+  });
 
   if (!event) {
     return NextResponse.json({ message: "Event not found" }, { status: 404 });
   }
 
-  const newTicketData: Omit<Ticket, "id" | "eventId"> = await request.json();
-  const newTicket: Ticket = {
-    id: `t${Date.now().toString()}`,
-    eventId: event.id,
-    ...newTicketData,
-  };
+  const newTicketData = await request.json();
 
-  tickets.push(newTicket);
+  const newTicket = await prisma.ticket.create({
+    data: {
+      ...newTicketData,
+      eventId: event.id,
+    },
+  });
+
   return NextResponse.json(newTicket, { status: 201 });
 }
-

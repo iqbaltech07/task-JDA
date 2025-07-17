@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Event } from '~/data/events';
+import { Event } from '@prisma/client';
 
 interface EventCardProps {
     event: Event;

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import EventCard from '~/components/EventCard';
 import PageContainer from '~/components/layouts/PageContainer';
-import { Event } from '~/data/events';
+import { Event } from '@prisma/client';
 
 const EventsPage: React.FC = () => {
     const [events, setEvents] = useState<Event[]>([]);

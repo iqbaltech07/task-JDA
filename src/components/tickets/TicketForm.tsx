@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Ticket } from '~/data/tickets';
+import { Ticket } from '@prisma/client';
 
 interface TicketFormProps {
   eventSlug: string;
@@ -19,7 +19,7 @@ const TicketForm: React.FC<TicketFormProps> = ({ eventSlug, ticket, onClose }) =
   useEffect(() => {
     if (ticket) {
       setFormData({
-        type: ticket.type,
+        type: ticket.type as 'VIP' | 'Regular',
         price: ticket.price.toString(),
         quantity: ticket.quantity.toString(),
       });

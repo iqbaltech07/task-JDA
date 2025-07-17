@@ -1,46 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { events, Event } from '~/data/events';
-import { tickets } from '~/data/tickets';
+import { prisma } from '~/libs/prisma';
 
 export async function GET() {
+  const events = await prisma.event.findMany();
   return NextResponse.json(events);
 }
 
 export async function POST(request: NextRequest) {
-  const newEventData: Omit<Event, 'id'> = await request.json();
-  const newEvent: Event = {
-    ...newEventData,
-    id: Date.now(),
-  };
-  events.push(newEvent);
+  const data = await request.json();
+  const newEvent = await prisma.event.create({
+    data: {
+      ...data,
+      slug: data.name.toLowerCase().replace(/\s+/g, '-'),
+    },
+  });
   return NextResponse.json(newEvent, { status: 201 });
 }
 
 export async function PUT(request: NextRequest) {
-  const updatedEvent: Event = await request.json();
-  const index = events.findIndex((e) => e.id === updatedEvent.id);
-
-  if (index !== -1) {
-    events[index] = updatedEvent;
-    return NextResponse.json(updatedEvent);
-  } else {
-    return NextResponse.json({ message: 'Event not found' }, { status: 404 });
-  }
+  const data = await request.json();
+  const { id, ...updateData } = data;
+  const updatedEvent = await prisma.event.update({
+    where: { id: Number(id) },
+    data: updateData,
+  });
+  return NextResponse.json(updatedEvent);
 }
 
 export async function DELETE(request: NextRequest) {
   const { id } = await request.json();
-  const eventIndex = events.findIndex((e) => e.id === id);
-
-  if (eventIndex !== -1) {
-    const deletedEvent = events.splice(eventIndex, 1);
-    
-    const remainingTickets = tickets.filter(ticket => ticket.eventId !== id);
-    tickets.length = 0;
-    tickets.push(...remainingTickets);
-
-    return NextResponse.json(deletedEvent[0]);
-  } else {
-    return NextResponse.json({ message: 'Event not found' }, { status: 404 });
-  }
+  const deletedEvent = await prisma.event.delete({
+    where: { id: Number(id) },
+  });
+  return NextResponse.json(deletedEvent);
 }

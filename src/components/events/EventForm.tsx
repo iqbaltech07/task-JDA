@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Event } from '~/data/events';
+import { Event } from '@prisma/client';
 
 interface EventFormProps {
   event: Event | null;
@@ -33,12 +33,9 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const slug = formData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-    
     const method = event ? 'PUT' : 'POST';
     const body = JSON.stringify({
-      id: event ? event.id : Date.now().toString(),
-      slug: slug,
+      id: event ? event.id : undefined,
       ...formData,
     });
 
